@@ -1,7 +1,7 @@
-//@author:llychao<lychao_vip@163.com>
-//@contributor: Junyi<me@junyi.pw>
-//@date:2020-02-18
-//@功能:golang m3u8 video Downloader
+// @author:llychao<lychao_vip@163.com>
+// @contributor: Junyi<me@junyi.pw>
+// @date:2020-02-18
+// @功能:golang m3u8 video Downloader
 package main
 
 import (
@@ -72,22 +72,8 @@ func main() {
 	Run()
 }
 
-func Run() {
-	msgTpl := "[功能]:多线程下载直播流m3u8视屏\n[提醒]:下载失败，请使用 -ht=apiv2 \n[提醒]:下载失败，m3u8 地址可能存在嵌套\n[提醒]:进度条中途下载失败，可重复执行"
-	fmt.Println(msgTpl)
-	runtime.GOMAXPROCS(runtime.NumCPU())
+func Download(m3u8Url, movieName, hostType, cookie, savePath string, maxGoroutines, insecure int) {
 	now := time.Now()
-
-	// 1、解析命令行参数
-	flag.Parse()
-	m3u8Url := *urlFlag
-	maxGoroutines := *nFlag
-	hostType := *htFlag
-	movieName := *oFlag
-	cookie := *cFlag
-	insecure := *sFlag
-	savePath := *spFlag
-
 	ro.Headers["Referer"] = getHost(m3u8Url, "apiv2")
 	if insecure != 0 {
 		ro.InsecureSkipVerify = true
@@ -135,6 +121,24 @@ func Run() {
 	//5、输出下载视频信息
 	DrawProgressBar("Merging", float32(1), PROGRESS_WIDTH, mv)
 	fmt.Printf("\n[Success] 下载保存路径：%s | 共耗时: %6.2fs\n", mv, time.Now().Sub(now).Seconds())
+
+}
+
+func Run() {
+	msgTpl := "[功能]:多线程下载直播流m3u8视屏\n[提醒]:下载失败，请使用 -ht=apiv2 \n[提醒]:下载失败，m3u8 地址可能存在嵌套\n[提醒]:进度条中途下载失败，可重复执行"
+	fmt.Println(msgTpl)
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	// 1、解析命令行参数
+	flag.Parse()
+	m3u8Url := *urlFlag
+	maxGoroutines := *nFlag
+	hostType := *htFlag
+	movieName := *oFlag
+	cookie := *cFlag
+	insecure := *sFlag
+	savePath := *spFlag
+	Download(m3u8Url, movieName, hostType, cookie, savePath, maxGoroutines, insecure)
 }
 
 // 获取m3u8地址的host
